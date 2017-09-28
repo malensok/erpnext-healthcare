@@ -27,7 +27,6 @@ doctype_js = {
 # setup wizard
 setup_wizard_requires = "assets/erpnext/js/setup_wizard.js"
 setup_wizard_complete = "erpnext.setup.setup_wizard.setup_wizard.setup_complete"
-setup_wizard_success = "erpnext.setup.setup_wizard.setup_wizard.setup_success"
 setup_wizard_test = "erpnext.setup.setup_wizard.test_setup_wizard.run_setup_wizard_test"
 
 before_install = "erpnext.setup.install.check_setup_wizard_not_completed"
@@ -42,7 +41,7 @@ update_and_get_user_progress = "erpnext.utilities.user_progress_utils.update_def
 on_session_creation = "erpnext.shopping_cart.utils.set_cart_count"
 on_logout = "erpnext.shopping_cart.utils.clear_cart_count"
 
-treeviews = ['Account', 'Cost Center', 'Warehouse', 'Item Group', 'Customer Group', 'Sales Person', 'Territory', "BOM"]
+treeviews = ['Account', 'Cost Center', 'Warehouse', 'Item Group', 'Customer Group', 'Sales Person', 'Territory']
 
 # website
 update_website_context = "erpnext.shopping_cart.utils.update_website_context"
@@ -81,7 +80,7 @@ website_route_rules = [
 	{"from_route": "/supplier-quotations/<path:name>", "to_route": "order",
 		"defaults": {
 			"doctype": "Supplier Quotation",
-			"parents": [{"label": _("Supplier Quotation"), "route": "quotations"}]
+			"parents": [{"label": _("Supplier Quotation"), "route": "supplier-quotations"}]
 		}
 	},
 	{"from_route": "/quotations", "to_route": "Quotation"},
@@ -128,11 +127,13 @@ standard_portal_menu_items = [
 	{"title": _("Shipments"), "route": "/shipments", "reference_doctype": "Delivery Note", "role":"Customer"},
 	{"title": _("Issues"), "route": "/issues", "reference_doctype": "Issue", "role":"Customer"},
 	{"title": _("Addresses"), "route": "/addresses", "reference_doctype": "Address"},
-	{"title": _("Fees"), "route": "/fees", "reference_doctype": "Fees", "role":"Student"},
+	{"title": _("Timesheets"), "route": "/timesheets", "reference_doctype": "Timesheet", "role":"Customer"},
 	{"title": _("Timesheets"), "route": "/timesheets", "reference_doctype": "Timesheet", "role":"Customer"},
 	{"title": _("Lab Test"), "route": "/lab-test", "reference_doctype": "Lab Test", "role":"Patient"},
 	{"title": _("Prescription"), "route": "/prescription", "reference_doctype": "Consultation", "role":"Patient"},
-	{"title": _("Patient Appointment"), "route": "/patient-appointments", "reference_doctype": "Patient Appointment", "role":"Patient"}
+	{"title": _("Patient Appointment"), "route": "/patient-appointments", "reference_doctype": "Patient Appointment", "role":"Patient"},
+	{"title": _("Fees"), "route": "/fees", "reference_doctype": "Fees", "role":"Student"},
+	{"title": _("Newsletter"), "route": "/newsletters", "reference_doctype": "Newsletter"}
 ]
 
 default_roles = [
@@ -190,7 +191,7 @@ doc_events = {
 
 scheduler_events = {
 	"hourly": [
-		"erpnext.controllers.recurring_document.create_recurring_documents",
+		"erpnext.accounts.doctype.subscription.subscription.make_subscription_entry",
 		'erpnext.hr.doctype.daily_work_summary_settings.daily_work_summary_settings.trigger_emails'
 	],
 	"daily": [
