@@ -13,6 +13,10 @@ def get_data():
 			{
 				'label': _('Lab Tests'),
 				'items': ['Lab Test']
+			},
+			{
+				'label': _('Clinical Procedures'),
+				'items': ['Clinical Procedure']
 			}
 		]
 	}
