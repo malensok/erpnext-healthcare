@@ -33,6 +33,11 @@ def get_data():
 					"type": "page",
 					"name": "appointment-analytic",
 					"label": _("Appointment Analytics"),
+				},
+				{
+					"type": "doctype",
+					"name": "Clinical Procedure",
+					"label": _("Clinical Procedure"),
 				}
 			]
 		},
@@ -151,6 +156,11 @@ def get_data():
 					"type": "doctype",
 					"name": "Lab Test Template",
 					"description": _("Lab Test Configurations.")
+				},
+				{
+					"type": "doctype",
+					"name": "Clinical Procedure Template",
+					"label": _("Clinical Procedure Template"),
 				}
 			]
 		}

@@ -52,6 +52,10 @@ frappe.ui.form.on('Consultation', {
 			create_medical_record(frm);
 		},"Create");
 
+		frm.add_custom_button(__("Procedure"),function(){
+		 	btn_create_procedure(frm);
+		},"Create");
+
 		frm.set_query("patient", function () {
 			return {
 				filters: {"disabled": 0}
@@ -141,6 +145,17 @@ var btn_create_vital_signs = function (frm) {
 		"patient": frm.doc.patient,
 	};
 	frappe.new_doc("Vital Signs");
+};
+
+var btn_create_procedure = function (frm) {
+	if(!frm.doc.patient){
+		frappe.throw("Please select patient");
+	}
+	frappe.route_options = {
+		"patient": frm.doc.patient,
+		"medical_department": frm.doc.visit_department
+	};
+	frappe.new_doc("Clinical Procedure");
 };
 
 var show_details = function(data){
