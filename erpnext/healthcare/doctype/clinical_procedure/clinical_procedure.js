@@ -144,6 +144,7 @@ frappe.ui.form.on('Clinical Procedure', {
 						frm.set_value("patient", data.message.patient)
 						frm.set_value("procedure_template", data.message.procedure_template)
 						frm.set_value("medical_department", data.message.department)
+						frm.set_value("service_unit", data.message.service_unit)
 						frm.set_value("start_dt", data.message.appointment_date)
 						frm.set_value("start_tm", data.message.appointment_time)
 					}
