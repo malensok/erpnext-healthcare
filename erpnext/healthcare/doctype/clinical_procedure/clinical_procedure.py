@@ -200,6 +200,7 @@ def create_procedure(appointment):
 	procedure.patient_age = appointment.patient_age
 	procedure.patient_sex = appointment.patient_sex
 	procedure.procedure_template = appointment.procedure_template
+	procedure.service_unit = appointment.service_unit
 	procedure.medical_department = appointment.department
 	procedure.start_dt = appointment.appointment_date
 	procedure.start_tm = appointment.appointment_time
