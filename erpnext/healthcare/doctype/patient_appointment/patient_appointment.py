@@ -41,12 +41,8 @@ class PatientAppointment(Document):
 		confirm_sms(self)
 
 	def save(self, *args, **kwargs):
-		# duration is the only changeable field in the document
-		if not self.is_new():
-			self.db_set('duration', cint(self.duration))
-		else:
+		if self.is_new():
 			super(PatientAppointment, self).save(*args, **kwargs)
-
 
 def appointment_cancel(appointment_id):
 	appointment = frappe.get_doc("Patient Appointment", appointment_id)
@@ -79,27 +75,30 @@ def get_availability_data(date, physician):
 	weekday = date.strftime("%A")
 
 	available_slots = []
+	slot_details = []
 	physician_schedule_name = None
 	physician_schedule = None
-	time_per_appointment = None
 
 	# get physicians schedule
-	physician_schedule_name = frappe.db.get_value("Physician", physician, "physician_schedule")
-	if physician_schedule_name:
-		physician_schedule = frappe.get_doc("Physician Schedule", physician_schedule_name)
-		time_per_appointment = frappe.db.get_value("Physician", physician, "time_per_appointment")
+	physician_obj = frappe.get_doc("Physician", physician)
+	if physician_obj.physician_schedules:
+		for schedule in physician_obj.physician_schedules:
+			if schedule.schedule:
+				physician_schedule = frappe.get_doc("Physician Schedule", schedule.schedule)
+			else:
+				frappe.throw(_("Dr {0} does not have a Physician Schedule. Add it in Physician master".format(physician)))
+
+			if physician_schedule:
+				available_slots = []
+				for t in physician_schedule.time_slots:
+					if weekday == t.day:
+						available_slots.append(t)
+
+				if schedule.service_unit and available_slots:
+				 	slot_details.append({"slot_name":schedule.service_unit,"avil_slot":available_slots})
+
 	else:
 		frappe.throw(_("Dr {0} does not have a Physician Schedule. Add it in Physician master".format(physician)))
-
-	if physician_schedule:
-		for t in physician_schedule.time_slots:
-			if weekday == t.day:
-				available_slots.append(t)
-
-	# `time_per_appointment` should never be None since validation in `Patient` is supposed to prevent
-	# that. However, it isn't impossible so we'll prepare for that.
-	if not time_per_appointment:
-		frappe.throw(_('"Time Per Appointment" hasn"t been set for Dr {0}. Add it in Physician master.').format(physician))
 
 	# if physician not available return
 	if not available_slots:
@@ -118,9 +117,9 @@ def get_availability_data(date, physician):
 		fields=["name", "appointment_time", "duration", "status"])
 
 	return {
+		"slot_details": slot_details,
 		"available_slots": available_slots,
-		"appointments": appointments,
-		"time_per_appointment": time_per_appointment
+		"appointments": appointments
 	}
 
 

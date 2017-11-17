@@ -127,25 +127,33 @@ frappe.ui.form.on('Patient Appointment', {
 				primary_action: function() {
 					// book slot
 					frm.set_value('appointment_time', selected_slot);
-					frm.set_value('duration', data.time_per_appointment);
+					frm.set_value('service_unit', service_unit);
 					d.hide();
 					frm.save();
 				}
 			});
 			var $wrapper = d.fields_dict.available_slots.$wrapper;
 			var selected_slot = null;
+			var service_unit = null;
 
 			// disable dialog action initially
 			d.get_primary_btn().attr('disabled', true);
 
-			// make buttons for each slot
-			var slot_html = data.available_slots.map(slot => {
-				return `<button class="btn btn-default"
-					data-name=${slot.from_time}
-					style="margin: 0 10px 10px 0; width: 72px">
-					${slot.from_time.substring(0, slot.from_time.length - 3)}
-				</button>`;
-			}).join("");
+			var slot_details = data.slot_details
+			var slot_html = ""
+			for (i = 0; i < slot_details.length; i++) {
+				slot_html = slot_html + `<label>${slot_details[i].slot_name}</label>`
+				slot_html = slot_html + `<br/>` + slot_details[i].avil_slot.map(slot => {
+					return `<button class="btn btn-default"
+						data-name=${slot.from_time}
+						data-serviceunit="${slot_details[i].slot_name}"
+						style="margin: 0 10px 10px 0; width: 72px">
+						${slot.from_time.substring(0, slot.from_time.length - 3)}
+					</button>`;
+				}).join("");
+				slot_html = slot_html + `<br/>`
+			}
+
 
 			$wrapper
 				.css('margin-bottom', 0)
@@ -167,7 +175,7 @@ frappe.ui.form.on('Patient Appointment', {
 				$wrapper.find('button').removeClass('btn-primary');
 				$btn.addClass('btn-primary');
 				selected_slot = $btn.attr('data-name');
-
+				service_unit = $btn.attr('data-serviceunit')
 				// enable dialog action
 				d.get_primary_btn().attr('disabled', null);
 			});
