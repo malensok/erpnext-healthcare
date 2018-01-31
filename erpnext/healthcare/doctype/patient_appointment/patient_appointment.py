@@ -143,7 +143,7 @@ def get_availability_data(date, physician):
 	appointments = frappe.get_all(
 		"Patient Appointment",
 		filters={"physician": physician, "appointment_date": date},
-		fields=["name", "appointment_time", "duration", "status"])
+		fields=["name", "appointment_time", "status"])
 
 	return {
 		"slot_details": slot_details,
