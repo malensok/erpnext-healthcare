@@ -337,5 +337,5 @@ def get_events(start, end, filters=None):
 @frappe.whitelist()
 def get_procedure_prescribed(patient):
 	return frappe.db.sql(_("""select pp.name, pp.procedure, pp.parent, ct.physician,
-	ct.consultation_date, pp.physician, pp.date from tabConsultation ct,
+	ct.consultation_date, pp.physician, pp.date, pp.department from tabConsultation ct,
 	`tabProcedure Prescription` pp where ct.patient='{0}' and pp.parent=ct.name and pp.appointment_booked=0""").format(patient))

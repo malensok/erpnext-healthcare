@@ -67,6 +67,14 @@ frappe.ui.form.on('Consultation', {
 				}
 			};
 		});
+		frm.set_query("physician", "procedure_prescription", function(doc, cdt, cdn) {
+			var child = locals[cdt][cdn]
+			return {
+				filters: {
+					department: child.department
+				}
+			};
+		});
 		frm.set_query("test_code", "test_prescription", function() {
 			return {
 				filters: {
@@ -265,6 +273,24 @@ frappe.ui.form.on("Drug Prescription", {
 		var child = locals[cdt][cdn];
 		if(child.in_every == "Hour"){
 			frappe.model.set_value(cdt, cdn, 'dosage', null);
+		}
+	}
+});
+
+frappe.ui.form.on("Procedure Prescription", {
+	procedure:  function(frm, cdt, cdn) {
+		var child = locals[cdt][cdn];
+		if(child.procedure){
+			frappe.call({
+				"method": "frappe.client.get",
+				args: {
+					doctype: "Clinical Procedure Template",
+					name: child.procedure,
+				},
+				callback: function (data) {
+					frappe.model.set_value(cdt, cdn, 'department',data.message.medical_department);
+				}
+			});
 		}
 	}
 });

@@ -234,20 +234,23 @@ var show_procedure_templates = function(frm, result){
 		<div class="col-xs-5"> %(procedure_template)s <br>%(physician)s  <br> %(date)s </div>\
 		<div class="col-xs-2">\
 		<a data-name="%(name)s" data-procedure-template="%(procedure_template)s"\
-		data-consultation="%(consultation)s" data-physician="%(physician)s" data-date="%(date)s" >\
+		data-consultation="%(consultation)s" data-physician="%(physician)s"\
+		data-date="%(date)s" data-department="%(department)s" >\
 		<button class="btn btn-default btn-xs">Add\
 		</button></a></div></div>', {name:y[0], procedure_template: y[1],
 			consultation:y[2], consulting_physician:y[3], consultation_date:y[4],
-			physician:y[5]? y[5]:'', date: y[6]? y[6]:''})).appendTo(html_field);
+			physician:y[5]? y[5]:'', date: y[6]? y[6]:'', department: y[7]? y[7]:''})).appendTo(html_field);
 		row.find("a").click(function() {
 			frm.doc.procedure_template = $(this).attr("data-procedure-template");
 			frm.doc.procedure_prescription = $(this).attr("data-name");
 			frm.doc.physician = $(this).attr("data-physician");
 			frm.doc.appointment_date = $(this).attr("data-date");
+			frm.doc.department = $(this).attr("data-department");
 			refresh_field("procedure_template");
 			refresh_field("procedure_prescription");
 			refresh_field("appointment_date");
 			refresh_field("physician");
+			refresh_field("department");
 			d.hide();
 			return false;
 		});
