@@ -130,13 +130,17 @@ def get_availability_data(date, physician):
 						available_slots.append(t)
 
 				if available_slots:
-				 	slot_details.append({"slot_name":schedule.service_unit,"avil_slot":available_slots})
+				 	if schedule.service_unit:
+						slot_name  = schedule.schedule+" - "+schedule.service_unit
+					else:
+						slot_name = schedule.schedule
+				 	slot_details.append({"slot_name":slot_name, "service_unit":schedule.service_unit, "avil_slot":available_slots})
 
 	else:
 		frappe.throw(_("Dr {0} does not have a Physician Schedule. Add it in Physician master".format(physician)))
 
 	# if physician not available return
-	if not available_slots:
+	if not available_slots and not slot_details:
 		# TODO: return available slots in nearby dates
 		frappe.throw(_("Physician not available on {0}").format(weekday))
 
@@ -153,7 +157,6 @@ def get_availability_data(date, physician):
 
 	return {
 		"slot_details": slot_details,
-		"available_slots": available_slots,
 		"appointments": appointments
 	}
 

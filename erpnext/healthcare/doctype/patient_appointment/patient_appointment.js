@@ -111,7 +111,7 @@ frappe.ui.form.on('Patient Appointment', {
 			callback: (r) => {
 				// console.log(r);
 				var data = r.message;
-				if(data.available_slots.length > 0) {
+				if(data.slot_details.length > 0) {
 					show_availability(data);
 				} else {
 					show_empty_state();
@@ -154,7 +154,7 @@ frappe.ui.form.on('Patient Appointment', {
 				slot_html = slot_html + `<br/>` + slot_details[i].avil_slot.map(slot => {
 					return `<button class="btn btn-default"
 						data-name=${slot.from_time}
-						data-serviceunit="${slot_details[i].slot_name}"
+						data-serviceunit="${slot_details[i].service_unit}"
 						style="margin: 0 10px 10px 0; width: 72px">
 						${slot.from_time.substring(0, slot.from_time.length - 3)}
 					</button>`;
