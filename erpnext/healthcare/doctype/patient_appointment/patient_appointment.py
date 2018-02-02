@@ -51,6 +51,9 @@ class PatientAppointment(Document):
 		if self.is_new():
 			super(PatientAppointment, self).save(*args, **kwargs)
 
+	def create_invoice(self):
+		return invoice_appointment(self)
+
 def appointment_cancel(appointment_id):
 	appointment = frappe.get_doc("Patient Appointment", appointment_id)
 
@@ -192,25 +195,32 @@ def confirm_sms(doc):
 
 
 @frappe.whitelist()
-def create_invoice(company, physician, patient, appointment_id, appointment_date):
-	if not appointment_id:
+def invoice_appointment(appointment_doc):
+	if not appointment_doc.name:
 		return False
 	sales_invoice = frappe.new_doc("Sales Invoice")
-	sales_invoice.customer = frappe.get_value("Patient", patient, "customer")
-	sales_invoice.appointment = appointment_id
+	sales_invoice.customer = frappe.get_value("Patient", appointment_doc.patient, "customer")
+	sales_invoice.appointment = appointment_doc.name
 	sales_invoice.due_date = getdate()
 	sales_invoice.is_pos = '0'
-	sales_invoice.debit_to = get_receivable_account(company)
+	sales_invoice.debit_to = get_receivable_account(appointment_doc.company)
 
-	fee_validity = get_fee_validity(physician, patient, appointment_date)
-	create_invoice_items(appointment_id, physician, company, sales_invoice)
+	fee_validity = get_fee_validity(appointment_doc.physician, appointment_doc.patient, appointment_doc.appointment_date)
+	if appointment_doc.procedure_template:
+		procedure_template_doc = frappe.get_doc("Clinical Procedure Template", appointment_doc.procedure_template)
+		if procedure_template_doc.is_billable:
+			create_invoice_items(procedure_template_doc, appointment_doc.physician, appointment_doc.company, sales_invoice)
+		else:
+			create_invoice_items(False, appointment_doc.physician, appointment_doc.company, sales_invoice)
+	else:
+		create_invoice_items(False, appointment_doc.physician, appointment_doc.company, sales_invoice)
 
 	sales_invoice.save(ignore_permissions=True)
-	frappe.db.sql("""update `tabPatient Appointment` set sales_invoice=%s where name=%s""", (sales_invoice.name, appointment_id))
+	frappe.db.sql("""update `tabPatient Appointment` set sales_invoice=%s where name=%s""", (sales_invoice.name, appointment_doc.name))
 	frappe.db.set_value("Fee Validity", fee_validity.name, "ref_invoice", sales_invoice.name)
 	consultation = frappe.db.exists({
 			"doctype": "Consultation",
-			"appointment": appointment_id})
+			"appointment": appointment_doc.name})
 	if consultation:
 		frappe.db.set_value("Consultation", consultation[0][0], "invoice", sales_invoice.name)
 	return sales_invoice.name
@@ -257,18 +267,25 @@ def create_fee_validity(physician, patient, date):
 	return fee_validity
 
 
-def create_invoice_items(appointment_id, physician, company, invoice):
+def create_invoice_items(procedure_template_doc, physician, company, invoice):
 	item_line = invoice.append("items")
-	item_line.item_name = "Consulting Charges"
-	item_line.description = "Consulting Charges:  " + physician
+	if not procedure_template_doc:
+		item_line.item_name = "Consulting Charges"
+		item_line.description = "Consulting Charges:  " + physician
+		op_consulting_charge = frappe.db.get_value("Physician", physician, "op_consulting_charge")
+		if op_consulting_charge:
+			item_line.rate = op_consulting_charge
+			item_line.amount = op_consulting_charge
+	else:
+		item_line.item_name = procedure_template_doc.item
+		item_line.description = procedure_template_doc.description
+		item_line.rate = procedure_template_doc.rate
+		item_line.amount = procedure_template_doc.rate
 	item_line.qty = 1
 	item_line.uom = "Nos"
 	item_line.conversion_factor = 1
 	item_line.income_account = get_income_account(physician, company)
-	op_consulting_charge = frappe.db.get_value("Physician", physician, "op_consulting_charge")
-	if op_consulting_charge:
-		item_line.rate = op_consulting_charge
-		item_line.amount = op_consulting_charge
+
 	return invoice
 
 

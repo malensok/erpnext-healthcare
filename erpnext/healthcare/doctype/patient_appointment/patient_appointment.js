@@ -322,10 +322,8 @@ var btn_update_status = function(frm, status){
 var btn_invoice_consultation = function(frm){
 	var doc = frm.doc;
 	frappe.call({
-		method:
-		"erpnext.healthcare.doctype.patient_appointment.patient_appointment.create_invoice",
-		args: {company: doc.company, physician:doc.physician, patient: doc.patient,
-			appointment_id: doc.name, appointment_date:doc.appointment_date },
+		doc: frm.doc,
+		method:"create_invoice",
 		callback: function(data){
 			if(!data.exc){
 				if(data.message){
