@@ -8,6 +8,14 @@ frappe.ui.form.on('Clinical Procedure', {
 				filters: {"disabled": 0}
 			}
 		});
+		frm.set_query("appointment", function () {
+			return {
+				filters: {
+					"procedure_template": ["not in", null],
+					"status": ['in', 'Open, Scheduled']
+				}
+			}
+		});
 		if(frm.doc.maintain_stock){
 			frm.set_indicator_formatter('item_code',
 				function(doc)	{ return (doc.qty<=doc.actual_qty) ? "green" : "orange" })
