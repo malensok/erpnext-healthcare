@@ -27,7 +27,8 @@ class PatientAppointment(Document):
 			frappe.db.set_value("Procedure Prescription", self.procedure_prescription, "appointment_booked", True)
 			comments = frappe.db.get_value("Procedure Prescription", self.procedure_prescription, "comments")
 			if comments:
-				self.notes = comments
+				frappe.db.set_value("Patient Appointment", self.name, "notes", comments)
+				self.reload()
 
 	def after_insert(self):
 		# Check fee validity exists

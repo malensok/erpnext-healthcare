@@ -205,6 +205,7 @@ def create_procedure(appointment):
 	procedure.start_dt = appointment.appointment_date
 	procedure.start_tm = appointment.appointment_time
 	procedure.invoice = appointment.sales_invoice
+	procedure.notes = appointment.notes
 	check_detail = frappe.db.get_values("Clinical Procedure Template", appointment.procedure_template, ["maintain_stock","has_stages"], as_dict=True)
 	if check_detail[0]['maintain_stock']:
 		procedure.maintain_stock = 1
